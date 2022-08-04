@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Файлы заголовков">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Файлы ресурсов">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="7zip">
+      <UniqueIdentifier>{4b0a0165-2b45-45a9-879b-3a9ec05b2a79}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AssetBundle.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="7zBuf.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7zCrc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7zFile.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7zTypes.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7zVersion.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Aes.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Alloc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Bcj2.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Bra.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Compiler.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="CpuArch.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Delta.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="DllSecur.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzFind.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzFindMt.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzHash.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Lzma2Dec.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Lzma2DecMt.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Lzma2Enc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Lzma86.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzmaDec.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzmaEnc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="LzmaLib.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="MtCoder.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="MtDec.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Ppmd.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Ppmd7.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Precomp.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="RotateDefs.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Sha256.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Sort.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Threads.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="Xz.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="XzCrc64.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="XzEnc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7z.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="7zAlloc.h">
+      <Filter>7zip</Filter>
+    </ClInclude>
+    <ClInclude Include="ArchiveInfo.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AssetBundle.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="7zArcIn.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zBuf.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zBuf2.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zCrc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zCrcOpt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zDec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zFile.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zStream.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Aes.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="AesOpt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Alloc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Bcj2.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Bcj2Enc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Bra.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Bra86.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="BraIA64.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="CpuArch.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Delta.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="DllSecur.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzFind.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzFindMt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzFindOpt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Lzma2Dec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Lzma2DecMt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Lzma2Enc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Lzma86Dec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Lzma86Enc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzmaDec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzmaEnc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="LzmaLib.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="MtCoder.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="MtDec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Ppmd7.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Ppmd7Dec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Ppmd7Enc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Sha256.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Sha256Opt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Sort.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Threads.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="Xz.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="XzCrc64.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="XzCrc64Opt.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="XzDec.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="XzEnc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="XzIn.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+    <ClCompile Include="7zAlloc.c">
+      <Filter>7zip</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
