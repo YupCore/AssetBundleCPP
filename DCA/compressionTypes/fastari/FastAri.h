@@ -16,8 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see http://www.gnu.org/licenses/
 Modified by YupCore.
                                                                          
+													               __    __   _______ _______  __
+													               /\   | |  | |  __ \|_   _|  \ \ 
+													              /  \  | |__| | |__) | | |   (_) |
+													             / /\ \ |  __  |  _  /  | |     | |
+													            / ____ \| |  | | | \ \ _| |_   _| |
+													           /_/    \_\_|  |_|_|  \_\_____| (_) |
+													                                           /_/ 
+                                    		
 
-                                                                     AHRI :)
                                                                                                                                                                                                                                                           
                                                                                 :77                                                                                                                                                                       
                                                                                .!7?~                                                                                                                                                                      
