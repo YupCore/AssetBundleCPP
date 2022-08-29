@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -30,26 +30,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -92,7 +92,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -117,7 +118,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -142,7 +144,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -152,7 +155,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>VCOMP.LIB;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -167,7 +170,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\includes\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -177,101 +181,73 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>VCOMP.LIB;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/Zc:preprocessor %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="7z.h" />
-    <ClInclude Include="7zAlloc.h" />
-    <ClInclude Include="7zBuf.h" />
-    <ClInclude Include="7zCrc.h" />
-    <ClInclude Include="7zFile.h" />
-    <ClInclude Include="7zTypes.h" />
-    <ClInclude Include="7zVersion.h" />
-    <ClInclude Include="Aes.h" />
-    <ClInclude Include="Alloc.h" />
     <ClInclude Include="ArchiveInfo.h" />
     <ClInclude Include="AssetBundle.h" />
-    <ClInclude Include="Bcj2.h" />
-    <ClInclude Include="Bra.h" />
-    <ClInclude Include="Compiler.h" />
-    <ClInclude Include="CpuArch.h" />
-    <ClInclude Include="Delta.h" />
-    <ClInclude Include="DllSecur.h" />
-    <ClInclude Include="LzFind.h" />
-    <ClInclude Include="LzFindMt.h" />
-    <ClInclude Include="LzHash.h" />
-    <ClInclude Include="Lzma2Dec.h" />
-    <ClInclude Include="Lzma2DecMt.h" />
-    <ClInclude Include="Lzma2Enc.h" />
-    <ClInclude Include="Lzma86.h" />
-    <ClInclude Include="LzmaDec.h" />
-    <ClInclude Include="LzmaEnc.h" />
-    <ClInclude Include="LzmaLib.h" />
-    <ClInclude Include="MtCoder.h" />
-    <ClInclude Include="MtDec.h" />
-    <ClInclude Include="Ppmd.h" />
-    <ClInclude Include="Ppmd7.h" />
-    <ClInclude Include="Precomp.h" />
-    <ClInclude Include="RotateDefs.h" />
-    <ClInclude Include="Sha256.h" />
-    <ClInclude Include="Sort.h" />
-    <ClInclude Include="Threads.h" />
-    <ClInclude Include="Xz.h" />
-    <ClInclude Include="XzCrc64.h" />
-    <ClInclude Include="XzEnc.h" />
+    <ClInclude Include="compressionTypes\fastari\FastAri.h" />
+    <ClInclude Include="compressionTypes\fastari\MTAri.h" />
+    <ClInclude Include="compressionTypes\lz77\lz77.h" />
+    <ClInclude Include="LzmaUtil.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="7zAlloc.c" />
-    <ClCompile Include="7zArcIn.c" />
-    <ClCompile Include="7zBuf.c" />
-    <ClCompile Include="7zBuf2.c" />
-    <ClCompile Include="7zCrc.c" />
-    <ClCompile Include="7zCrcOpt.c" />
-    <ClCompile Include="7zDec.c" />
-    <ClCompile Include="7zFile.c" />
-    <ClCompile Include="7zStream.c" />
-    <ClCompile Include="Aes.c" />
-    <ClCompile Include="AesOpt.c" />
-    <ClCompile Include="Alloc.c" />
     <ClCompile Include="AssetBundle.cpp" />
-    <ClCompile Include="Bcj2.c" />
-    <ClCompile Include="Bcj2Enc.c" />
-    <ClCompile Include="Bra.c" />
-    <ClCompile Include="Bra86.c" />
-    <ClCompile Include="BraIA64.c" />
-    <ClCompile Include="CpuArch.c" />
-    <ClCompile Include="Delta.c" />
-    <ClCompile Include="DllSecur.c" />
-    <ClCompile Include="LzFind.c" />
-    <ClCompile Include="LzFindMt.c" />
-    <ClCompile Include="LzFindOpt.c" />
-    <ClCompile Include="Lzma2Dec.c" />
-    <ClCompile Include="Lzma2DecMt.c" />
-    <ClCompile Include="Lzma2Enc.c" />
-    <ClCompile Include="Lzma86Dec.c" />
-    <ClCompile Include="Lzma86Enc.c" />
-    <ClCompile Include="LzmaDec.c" />
-    <ClCompile Include="LzmaEnc.c" />
-    <ClCompile Include="LzmaLib.c" />
-    <ClCompile Include="MtCoder.c" />
-    <ClCompile Include="MtDec.c" />
-    <ClCompile Include="Ppmd7.c" />
-    <ClCompile Include="Ppmd7Dec.c" />
-    <ClCompile Include="Ppmd7Enc.c" />
-    <ClCompile Include="Sha256.c" />
-    <ClCompile Include="Sha256Opt.c" />
-    <ClCompile Include="Sort.c" />
-    <ClCompile Include="Threads.c" />
-    <ClCompile Include="Xz.c" />
-    <ClCompile Include="XzCrc64.c" />
-    <ClCompile Include="XzCrc64Opt.c" />
-    <ClCompile Include="XzDec.c" />
-    <ClCompile Include="XzEnc.c" />
-    <ClCompile Include="XzIn.c" />
+    <ClCompile Include="compressionTypes\fastari\FastAri.cpp" />
+    <ClCompile Include="compressionTypes\fastari\MTAri.cpp" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zAlloc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zArcIn.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zBuf.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zBuf2.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zCrc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zCrcOpt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zDec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zFile.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\7zStream.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Aes.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\AesOpt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Alloc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Bcj2.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Bcj2Enc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Bra.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Bra86.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\BraIA64.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\CpuArch.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Delta.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\DllSecur.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzFind.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzFindMt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzFindOpt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2Dec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2DecMt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2Enc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma86Dec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma86Enc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaDec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaEnc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaLib.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\MtCoder.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\MtDec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7Dec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7Enc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Sha256.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Sha256Opt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Sort.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Threads.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\Xz.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\XzCrc64.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\XzCrc64Opt.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\XzDec.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\XzEnc.c" />
+    <ClCompile Include="compressionTypes\lzmasdk\XzIn.c" />
+    <ClCompile Include="LzmaUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

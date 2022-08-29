@@ -1,33 +1,35 @@
 #pragma once
 #include "AssetBundle.h"
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
-#include <cereal/types/tuple.hpp>
-#include <cereal/types/map.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/archives/json.hpp>
+#include "serializer.h"
+#include <map>
 
-namespace cereal
+enum CompressionType : int
 {
-	//! Serializing for std::pair
-	template <class Archive, class T1, class T2> inline
-		void CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, std::pair<T1, T2>& pair)
-	{
-		ar(CEREAL_NVP_("first", pair.first),
-			CEREAL_NVP_("second", pair.second));
-	}
-} // namespace cereal
+	LZMA2,
+	LZ77,
+	FastAri, //Use only for text based files or binary 3d models. it can compress them better then lzma2 and faster, but for not binary data like mp3,wav,bin,exe,dll etc
+	MTAri, // same algorithm as fast ari but multithreaded(both compression and decompression) TEMPORARLY BROKEN DO NOT USE
+	NoCompression
+};
 
 struct ArchiveInfo
 {
 public:
 	std::string bundleName;
-	unsigned int headerSize = 0;
-	std::map<std::string, std::pair<unsigned long long, unsigned long long>> fileMap; // the first one is starting point, the second one is size
+	CompressionType compressionType;
+	std::map<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>> fileMap; // name as key, in first pair key is uncompressed size, the first one is starting point, the second one is size
 
-	template <class Archive>
-	void serialize(Archive& ar)
+	ArchiveInfo() = default;
+	ArchiveInfo(std::string name, CompressionType type, std::map<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>> mp)
 	{
-		ar(CEREAL_NVP_("archiveName", bundleName), CEREAL_NVP_("fileMap", fileMap), CEREAL_NVP_("headerSize", headerSize));
+		this->bundleName = name;
+		this->compressionType = type;
+		this->fileMap = mp;
+	}
+	friend zpp::serializer::access;
+	template <typename Archive, typename Self>
+	static void serialize(Archive& archive, Self& self)
+	{
+		archive(self.bundleName,self.compressionType, self.fileMap);
 	}
 };

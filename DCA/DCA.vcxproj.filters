@@ -13,270 +13,186 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="compressions">
+      <UniqueIdentifier>{5eb406dd-15b7-45a9-95e3-c616e6393a29}</UniqueIdentifier>
+    </Filter>
     <Filter Include="7zip">
-      <UniqueIdentifier>{4b0a0165-2b45-45a9-879b-3a9ec05b2a79}</UniqueIdentifier>
+      <UniqueIdentifier>{0e19add9-0a1d-4346-a88d-4ad45ee4dcf2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetBundle.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="7zBuf.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7zCrc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7zFile.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7zTypes.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7zVersion.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Aes.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Alloc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Bcj2.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Bra.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Compiler.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="CpuArch.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Delta.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="DllSecur.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzFind.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzFindMt.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzHash.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Lzma2Dec.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Lzma2DecMt.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Lzma2Enc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Lzma86.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzmaDec.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzmaEnc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="LzmaLib.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="MtCoder.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="MtDec.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Ppmd.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Ppmd7.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Precomp.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="RotateDefs.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Sha256.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Sort.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Threads.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="Xz.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="XzCrc64.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="XzEnc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7z.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
-    <ClInclude Include="7zAlloc.h">
-      <Filter>7zip</Filter>
-    </ClInclude>
     <ClInclude Include="ArchiveInfo.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="LzmaUtil.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lz77\lz77.h">
+      <Filter>compressions</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\fastari\FastAri.h">
+      <Filter>compressions</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\fastari\MTAri.h">
+      <Filter>compressions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetBundle.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="7zArcIn.c">
+    <ClCompile Include="LzmaUtil.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\lzmasdk\7zCrc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zBuf.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zCrcOpt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zBuf2.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zDec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zCrc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zFile.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zCrcOpt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zStream.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zDec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Aes.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zFile.c">
+    <ClCompile Include="compressionTypes\lzmasdk\AesOpt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zStream.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Alloc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Aes.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Bcj2.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="AesOpt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Bcj2Enc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Alloc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Bra.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Bcj2.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Bra86.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Bcj2Enc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\BraIA64.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Bra.c">
+    <ClCompile Include="compressionTypes\lzmasdk\CpuArch.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Bra86.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Delta.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="BraIA64.c">
+    <ClCompile Include="compressionTypes\lzmasdk\DllSecur.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="CpuArch.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzFind.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Delta.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzFindMt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="DllSecur.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzFindOpt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzFind.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2Dec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzFindMt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2DecMt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzFindOpt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma2Enc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Lzma2Dec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma86Dec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Lzma2DecMt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Lzma86Enc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Lzma2Enc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaDec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Lzma86Dec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaEnc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Lzma86Enc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\LzmaLib.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzmaDec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\MtCoder.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzmaEnc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\MtDec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="LzmaLib.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="MtCoder.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7Dec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="MtDec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Ppmd7Enc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Ppmd7.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Sha256.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Ppmd7Dec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Sha256Opt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Ppmd7Enc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Sort.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Sha256.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Threads.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Sha256Opt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\Xz.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Sort.c">
+    <ClCompile Include="compressionTypes\lzmasdk\XzCrc64.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Threads.c">
+    <ClCompile Include="compressionTypes\lzmasdk\XzCrc64Opt.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="Xz.c">
+    <ClCompile Include="compressionTypes\lzmasdk\XzDec.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="XzCrc64.c">
+    <ClCompile Include="compressionTypes\lzmasdk\XzEnc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="XzCrc64Opt.c">
+    <ClCompile Include="compressionTypes\lzmasdk\XzIn.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="XzDec.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zAlloc.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="XzEnc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zArcIn.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="XzIn.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zBuf.c">
       <Filter>7zip</Filter>
     </ClCompile>
-    <ClCompile Include="7zAlloc.c">
+    <ClCompile Include="compressionTypes\lzmasdk\7zBuf2.c">
       <Filter>7zip</Filter>
     </ClCompile>
+    <ClCompile Include="compressionTypes\fastari\FastAri.cpp">
+      <Filter>compressions</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\fastari\MTAri.cpp">
+      <Filter>compressions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
 </Project>
