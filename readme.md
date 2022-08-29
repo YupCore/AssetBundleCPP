@@ -2,14 +2,22 @@
 
 
 C++ archive format with dynamic header size and easy to use api.
+
 Has multiple compressions:
+
 -LZMA2  	(very high compression ratio)
+
 -LZ77   	(fast and relatable compressor, avarage compression ration)
+
 -FastAri	(fastest compressor but mostly to use with text or files with repeating contents, might be bad for binary files)
+
 -MTAri		(multithreaded version of fastari but DOESN'T work now! please fix:( )
+
 -No compression(store)
 
+
 Example:
+
 ```cpp
 #include <AssetBundle.h>
 #include <filesystem>
