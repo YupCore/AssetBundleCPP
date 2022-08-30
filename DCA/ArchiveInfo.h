@@ -8,7 +8,7 @@ enum CompressionType : int
 	LZMA2,
 	LZ77,
 	FastAri, //Use only for text based files or binary 3d models. it can compress them better then lzma2 and faster, but for not binary data like mp3,wav,bin,exe,dll etc
-	MTAri, // same algorithm as fast ari but multithreaded(both compression and decompression) TEMPORARLY BROKEN DO NOT USE
+	MTAri, // same algorithm as fast ari but multithreaded(both compression and decompression) DECOMPRESSION IS BROKEN
 	NoCompression
 };
 

@@ -5,6 +5,9 @@
 #include "compressionTypes/lz77/lz77.h"
 #include "compressionTypes/fastari/FastAri.h"
 #include "compressionTypes/fastari/MTAri.h"
+#include <stdio.h>
+#include <Windows.h>
+#include <random>
 
 namespace fs = std::filesystem;
 
@@ -76,6 +79,60 @@ void reverseStr(std::string& str)
 	// corners
 	for (int i = 0; i < n / 2; i++)
 		std::swap(str[i], str[n - i - 1]);
+}
+
+FILE* createTempFile(const char* mode, std::string& outPath)
+{
+	//HANDLE hTempFile = INVALID_HANDLE_VALUE;
+
+	//BOOL fSuccess = FALSE;
+	//DWORD dwRetVal = 0;
+	//UINT uRetVal = 0;
+
+	//DWORD dwBytesRead = 0;
+	//DWORD dwBytesWritten = 0;
+
+	//CHAR szTempFileName[MAX_PATH];
+	//CHAR lpTempPathBuffer[MAX_PATH];
+
+	////  Gets the temp path env string (no guarantee it's a valid path).
+	//dwRetVal = GetTempPathA(MAX_PATH,          // length of the buffer
+	//	lpTempPathBuffer); // buffer for path 
+
+	////  Generates a temporary file name. 
+	//uRetVal = GetTempFileNameA(lpTempPathBuffer, // directory for tmp files
+	//	"TMPF",     // temp file name prefix 
+	//	0,                // create unique name 
+	//	szTempFileName);  // buffer for name 
+
+	////  Creates the new file to write to for the upper-case version.
+	//hTempFile = CreateFileA(szTempFileName, // file name 
+	//	GENERIC_WRITE,        // open for write 
+	//	0,                    // do not share 
+	//	NULL,                 // default security 
+	//	CREATE_ALWAYS,        // overwrite existing
+	//	FILE_ATTRIBUTE_NORMAL,// normal file 
+	//	NULL);                // no template 
+
+	//int nHandle = _open_osfhandle((long)hTempFile, _O_BINARY | _O_RDWR);
+	//if (nHandle == -1) {
+	//	::CloseHandle(hTempFile);   //case 1
+	//	return nullptr;
+	//}
+
+	//return _fdopen(nHandle, "wb+");
+
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, MAXINT32); // distribution in range [1, MAXINT32]
+
+
+	std::string tempPath2 = std::filesystem::current_path().string() + "\\" + std::to_string(dist6(rng)) + ".tmpf";
+	std::cout << "Temp path is: " + tempPath2 + "\n";
+	outPath = tempPath2;
+	FILE* fn1;
+	fopen_s(&fn1, tempPath2.c_str(), mode);
+	return fn1;
 }
 
 AssetBundle::AssetBundle(std::string bundleName, int compressionLevel, CompressionType compType, std::string relativeTo, std::string* inFiles, int argslen) //Compression 0-9 for lzma2, for others 0-12
@@ -152,28 +209,38 @@ AssetBundle::AssetBundle(std::string bundleName, int compressionLevel, Compressi
 		}
 		else if (arrinf.compressionType == CompressionType::MTAri)
 		{
-			int rc;
-			std::string ibuf((char*)buffer, size);
-			std::string obuf = "";
-			rc = MTAri::mtfa_compress(ibuf,obuf,4, 0x400000);
+			file.close();
+			srand(time(NULL));
+			FILE* fn1;
+			fopen_s(&fn1,inFiles[i].c_str(), "rb+");
+			std::string tempPath2 = "";
+			FILE* fn2 = createTempFile("wb+",tempPath2);
+
+
+			int rc = MTAri::mtfa_compress(fn1,fn2,4,BUFSIZE);
+			fclose(fn1);
 			if (rc == 0)
 			{
-				throw std::exception(("CRITICAL ERROR WHILE COMPRESSING: " + inFiles[i]).c_str());
+				throw std::exception("CRITICAL COMPRESSION ERROR");
 			}
-			if (obuf.size() >= size)
+
+			auto sizeOut = _ftelli64(fn2);
+			if (sizeOut >= size)
 			{
+				fclose(fn2);
+				remove(tempPath2.c_str());
 				compressedData = (uint8_t*)malloc(size);
 				memcpy(compressedData, buffer, size);
 				outSize = size;
 			}
 			else
 			{
-				outSize = obuf.size();
-				compressedData = (uint8_t*)malloc(outSize);
-				memcpy(compressedData, obuf.c_str(), obuf.size());
+				compressedData = (uint8_t*)malloc(sizeOut);
+				outSize = sizeOut;
+				fread(compressedData, sizeof(unsigned char), sizeOut, fn2);
+				fclose(fn2);
+				remove(tempPath2.c_str());
 			}
-			ibuf.clear();
-			obuf.clear();
 		}
 		if (arrinf.compressionType == CompressionType::NoCompression)
 		{
@@ -198,7 +265,9 @@ AssetBundle::AssetBundle(std::string bundleName, int compressionLevel, Compressi
 			fs.seekp(0, std::ios_base::end);
 			uint64_t endPos = fs.tellp();
 			arrinf.fileMap.insert(std::pair<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>>(getRelative(inFiles[i], relativeTo), std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>(size, std::pair<unsigned long long, unsigned long long>(endPos - outSize, outSize))));  // это сука пиздец блять а не карта
-			file.close();
+			if(file.is_open())
+				file.close();
+			
 			numCompressed += 1;
 		}
 	}
@@ -423,24 +492,32 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 	{
 		if (dataPair.first == dataPair.second.second)
 		{
+			printf_s("Using no compression procedure...\n");
 			decompressed = (uint8_t*)malloc(dataPair.first);
 			memcpy(decompressed, segment, dataPair.first);
 			outSize = dataPair.first;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			std::string inptBuf(segment, size);
-			std::string obuf;
-			int rc = MTAri::mtfa_decompress(inptBuf,obuf,4);
+			std::string tmp1 = "";
+			std::string tmp2 = "";
+			FILE* f1 = createTempFile("wb+",tmp1);
+			fwrite(segment, sizeof(char), size, f1);
+			FILE* f2 = createTempFile("wb+",tmp2);
+			int rc = MTAri::mtfa_decompress(f1, f2, 4);
+			fclose(f1);
+			remove(tmp1.c_str());
+
 			if (rc == 0)
 			{
-				throw std::exception(("CRITICAL ERROR WHILE DECOMPRESSING: " + std::string(fileName)).c_str());
+				throw std::exception("CRITICAL DECOMPRESSION ERROR");
 			}
-			outSize = dataPair.first;
-			memcpy(decompressed, obuf.c_str(), obuf.size());
-			obuf.clear();
-			inptBuf.clear();
+			auto sizeOut = _ftelli64(f2);
+			outSize = sizeOut;
+			decompressed = (uint8_t*)malloc(sizeOut);
+			fread(decompressed, sizeof(unsigned char), sizeOut, f2);
+			fclose(f2);
+			remove(tmp2.c_str());
 		}
 	}
 	else if (arrinf.compressionType == CompressionType::NoCompression)
