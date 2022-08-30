@@ -24,12 +24,8 @@ extern "C++"
 	class YupGamesArchive_API AssetBundle
 	{
 	public:
-		//std::string bundleInfoStr, bundlePathRelative;
 
 		std::fstream bundleFile;
-		//std::vector<std::string> fileNames;
-		//std::vector<unsigned long long> fileIndexes;
-		//unsigned int headerSize;
 
 		ArchiveInfo arrinf;
 
