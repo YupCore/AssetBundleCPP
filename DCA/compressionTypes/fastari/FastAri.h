@@ -124,9 +124,20 @@ Modified by YupCore.
 #define ORDER 17
 #define ADAPT 4
 const int mask = (1 << ORDER) - 1;
+
+//NEW
+#define FA_WORKMEM ((((size_t) 1) << 17) * sizeof(unsigned short))
+//END NEW
+
 class FastAri
 {
 public:
-	static int fa_compress(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen);
-	static int fa_decompress(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t olen);
+	static int fa_compress(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen, void* workmem);
+	static int fa_decompress(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t olen, void* workmem);
+
+    static int fa_compress_2013(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen);
+    static int fa_decompress_2013(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t olen);
+
+    static int fa_compress_safe(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen, void* workmem);
+    static int fa_decompress_safe(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen, void* workmem);
 };

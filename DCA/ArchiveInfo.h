@@ -7,8 +7,15 @@ enum CompressionType : int
 {
 	LZMA2,
 	LZ77,
-	FastAri, //Use only for text based files or binary 3d models. it can compress them better then lzma2 and faster, but for not binary data like mp3,wav,bin,exe,dll etc
-	MTAri, // same algorithm as fast ari but multithreaded(both compression and decompression) DECOMPRESSION IS BROKEN
+	FastAri,		//Use only for text based files or binary 3d models. it can compress them better then lzma2 and faster, but for not binary data like mp3,wav,bin,exe,dll etc
+	FastAri2013,	//Faster compression but slower decompression
+	FPC,			//Fast Prefix coder(Huffman + Arithmethic)
+	MTAri,			// same algorithm as fast ari but multithreaded(both compression and decompression) InDev: DECOMPRESSION IS BROKEN, dec_block doesnt work for some reaseon. I assume this is something with ilens and olens but I don't have time for this
+	Doboz,
+	LZJB,
+	LZSSE,
+	BSC,
+	LZP,
 	NoCompression
 };
 

@@ -1,0 +1,8 @@
+﻿  AssetBundle.cpp
+I:\source\repos\DCA\DCA\AssetBundle.h(28,16): warning C4251: AssetBundle::bundleFile: class "std::basic_fstream<char,std::char_traits<char>>" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
+I:\vs2022\VC\Tools\MSVC\14.30.30705\include\iosfwd(230): message : см. объявление "std::basic_fstream<char,std::char_traits<char>>"
+I:\source\repos\DCA\DCA\AssetBundle.h(30,15): warning C4251: AssetBundle::arrinf: struct "ArchiveInfo" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
+I:\source\repos\DCA\DCA\ArchiveInfo.h(20): message : см. объявление "ArchiveInfo"
+I:\source\repos\DCA\DCA\compressionTypes\lz77\lz77.h(175,27): warning C4267: =: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+I:\source\repos\DCA\DCA\compressionTypes\fastari\MTAri.h(3,1): warning C4005: _CRT_SECURE_NO_WARNINGS: изменение макроопределения
+I:\source\repos\DCA\DCA\AssetBundle.cpp : message : см. предыдущее определение "_CRT_SECURE_NO_WARNINGS"

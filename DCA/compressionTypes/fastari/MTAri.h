@@ -17,8 +17,7 @@
 class MTAri
 {
 public:
-	//static int mtfa_compress(std::stringstream& inptStream, std::stringstream& outStream);
-	//static int mtfa_decompress(std::stringstream& inptStream, std::stringstream& outStream);
+
 	static int mtfa_compress(FILE* fin, FILE* fout, int tcnt, size_t bsz, int par = 0);
 	static int mtfa_decompress(FILE* fin, FILE* fout, int tcnt);
 };

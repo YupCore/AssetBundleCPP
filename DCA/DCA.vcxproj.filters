@@ -19,6 +19,12 @@
     <Filter Include="7zip">
       <UniqueIdentifier>{0e19add9-0a1d-4346-a88d-4ad45ee4dcf2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="compressions\lzsse">
+      <UniqueIdentifier>{8a70cd05-eaaa-4ec7-89a1-4f348e15c0d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="compressions\libbsc">
+      <UniqueIdentifier>{3f798745-5a95-4231-ab70-1096c6d6a8c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetBundle.h">
@@ -37,6 +43,75 @@
       <Filter>compressions</Filter>
     </ClInclude>
     <ClInclude Include="compressionTypes\fastari\MTAri.h">
+      <Filter>compressions</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzjb\lzjb.h">
+      <Filter>compressions</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse2\lzsse2.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse2\lzsse2_platform.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse4\lzsse4.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse4\lzsse4_platform.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse8\lzsse8.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\lzsse\lzsse8\lzsse8_platform.h">
+      <Filter>compressions\lzsse</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\adler32\adler32.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\bwt\bwt.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\bwt\libsais\libsais.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\coder.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\common\predictor.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\common\rangecoder.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\common\tables.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\qlfc\qlfc.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\coder\qlfc\qlfc_model.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\filters\tables.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\filters.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\libbsc.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\lzp\lzp.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\platform\platform.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\libbsc\st\st.h">
+      <Filter>compressions\libbsc</Filter>
+    </ClInclude>
+    <ClInclude Include="compressionTypes\FPC\fpc.h">
       <Filter>compressions</Filter>
     </ClInclude>
   </ItemGroup>
@@ -189,6 +264,57 @@
       <Filter>compressions</Filter>
     </ClCompile>
     <ClCompile Include="compressionTypes\fastari\MTAri.cpp">
+      <Filter>compressions</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\lzjb\lzjb.c">
+      <Filter>compressions</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\lzsse\lzsse2\lzsse2.cpp">
+      <Filter>compressions\lzsse</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\lzsse\lzsse4\lzsse4.cpp">
+      <Filter>compressions\lzsse</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\lzsse\lzsse8\lzsse8.cpp">
+      <Filter>compressions\lzsse</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\adler32\adler32.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\bwt\bwt.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\bwt\libsais\libsais.c">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\coder\coder.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\coder\qlfc\qlfc.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\coder\qlfc\qlfc_model.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\filters\detectors.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\filters\preprocessing.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\libbsc\libbsc.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\lzp\lzp.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\platform\platform.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\libbsc\st\st.cpp">
+      <Filter>compressions\libbsc</Filter>
+    </ClCompile>
+    <ClCompile Include="compressionTypes\FPC\fpc.c">
       <Filter>compressions</Filter>
     </ClCompile>
   </ItemGroup>
