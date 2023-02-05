@@ -1,0 +1,10 @@
+^E:\SOURCE\REPOS\DCA\INCLUDES\SHA256\SHA256-MASTER\CMAKEFILES\A345F42384A247223A7552E462FE25D9\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/source/repos/DCA/includes/sha256/SHA256-master -BE:/source/repos/DCA/includes/sha256/SHA256-master --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/source/repos/DCA/includes/sha256/SHA256-master/SHA256.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

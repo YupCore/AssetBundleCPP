@@ -3,15 +3,11 @@
 #include "serializer.h"
 #include <map>
 
-enum CompressionType : int
+enum ArchiveCompressionType : int
 {
 	LZMA2,
 	LZ77,
-	FastAri,		//Use only for text based files or binary 3d models. it can compress them better then lzma2 and faster, but for not binary data like mp3,wav,bin,exe,dll etc
-	FastAri2013,	//Faster compression but slower decompression
-	FPC,			//Fast Prefix coder(Huffman + Arithmethic)
-	MTAri,			// same algorithm as fast ari but multithreaded(both compression and decompression) InDev: DECOMPRESSION IS BROKEN, dec_block doesnt work for some reaseon. I assume this is something with ilens and olens but I don't have time for this
-	Doboz,
+	FastAri,	//Faster compression but slower decompression
 	LZJB,
 	LZSSE,
 	BSC,
@@ -19,24 +15,54 @@ enum CompressionType : int
 	NoCompression
 };
 
+struct ArchiveFileInfo
+{
+public:
+	std::string name;
+	uint64_t startPosition;
+	uint64_t compressedSize;
+	uint64_t uncompressedSize;
+	uint32_t crc32hash;
+
+	ArchiveFileInfo() = default;
+	ArchiveFileInfo(std::string name, uint64_t uncompressedSize, uint64_t startPosition, uint64_t compressedSize, uint32_t crc32hash)
+	{
+		this->name = name;
+		this->startPosition = startPosition;
+		this->compressedSize = compressedSize;
+		this->uncompressedSize = uncompressedSize;
+		this->crc32hash = crc32hash;
+	}
+
+	friend zpp::serializer::access;
+	template <typename Archive, typename Self>
+	static void serialize(Archive& archive, Self& self)
+	{
+		archive(self.name, self.startPosition, self.compressedSize, self.uncompressedSize, self.crc32hash);
+	}
+};
+
 struct ArchiveInfo
 {
 public:
 	std::string bundleName;
-	CompressionType compressionType;
-	std::map<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>> fileMap; // name as key, in first pair key is uncompressed size, the first one is starting point, the second one is size
+	ArchiveCompressionType arcC;
+	std::vector<ArchiveFileInfo> filesInfo;
+	bool buildHash = false;
+	//std::map<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>> fileMap; // name as key, in first pair key is uncompressed size, the first one is starting point, the second one is size
 
 	ArchiveInfo() = default;
-	ArchiveInfo(std::string name, CompressionType type, std::map<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>> mp)
+	ArchiveInfo(std::string name, ArchiveCompressionType type, std::vector<ArchiveFileInfo> filesInfo, bool buildHash)
 	{
 		this->bundleName = name;
-		this->compressionType = type;
-		this->fileMap = mp;
+		this->arcC = type;
+		this->filesInfo = filesInfo;
+		this->buildHash = buildHash;
 	}
 	friend zpp::serializer::access;
 	template <typename Archive, typename Self>
 	static void serialize(Archive& archive, Self& self)
 	{
-		archive(self.bundleName,self.compressionType, self.fileMap);
+		archive(self.bundleName,self.arcC, self.filesInfo, self.buildHash);
 	}
 };

@@ -6,25 +6,12 @@
 #include "compressionTypes/fastari/FastAri.h"
 #include "compressionTypes/fastari/MTAri.h"
 #include "compressionTypes/lzjb/lzjb.h"
-#include "compressionTypes/FPC/fpc.h"
-
-//lzsse
-#ifndef _OPEN_MP
-#define _OPEN_MP
-#endif // !_OPEN_MP
-#ifndef _OPENMP
-#define _OPENMP
-#endif // !_OPENMP
 
 #include "compressionTypes/lzsse/lzsse2/lzsse2.h"
 #include "compressionTypes/lzsse/lzsse4/lzsse4.h"
 #include "compressionTypes/lzsse/lzsse8/lzsse8.h"
 //end lzssse
 
-//Doboz
-#include <Compressor.h>
-#include <Decompressor.h>
-//End doboz
 #include "compressionTypes/libbsc/libbsc.h"
 #include "compressionTypes/libbsc/lzp/lzp.h"
 
@@ -32,8 +19,44 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <random>
+#include <cassert>
+#include <thread>
+#include <algorithm>
+#include <direct.h>
+
 
 namespace fs = std::filesystem;
+
+static void generate_table(uint32_t(&table)[256])
+{
+	uint32_t polynomial = 0xEDB88320;
+	for (uint32_t i = 0; i < 256; i++)
+	{
+		uint32_t c = i;
+		for (size_t j = 0; j < 8; j++)
+		{
+			if (c & 1) {
+				c = polynomial ^ (c >> 1);
+			}
+			else {
+				c >>= 1;
+			}
+		}
+		table[i] = c;
+	}
+}
+
+static uint32_t updateCRC(uint32_t(&table)[256], uint32_t initial, const void* buf, size_t len)
+{
+	uint32_t c = initial ^ 0xFFFFFFFF;
+	const uint8_t* u = static_cast<const uint8_t*>(buf);
+	for (size_t i = 0; i < len; ++i)
+	{
+		c = table[(c ^ u[i]) & 0xFF] ^ (c >> 8);
+	}
+	return c ^ 0xFFFFFFFF;
+}
+
 
 std::string getRelative(std::string filePath, std::string relativeTo)
 {
@@ -62,7 +85,6 @@ std::vector<std::string> split(std::string x, char delim = ' ')
 
 std::string SerializeInfo(ArchiveInfo info)
 {
-
 	std::vector<unsigned char> data;
 
 	zpp::serializer::memory_output_archive out(data);
@@ -120,330 +142,444 @@ FILE* createTempFile(const char* mode, std::string& outPath)
 	return fn1;
 }
 
-AssetBundle::AssetBundle(std::string bundleName, int compressionLevel, CompressionType compType, std::string relativeTo, std::string* inFiles, int argslen) //Compression 0-9 for lzma2, for others 0-12
+void CompressFile(std::string inFile, uint8_t*& buffer, uint64_t size, ArchiveInfo& arrinf , int compressionLevel, uint8_t*& compressedData, uint64_t& outSize)
 {
-	bsc_init( LIBBSC_FEATURE_MULTITHREADING);
-	std::ofstream fs(bundleName, std::ios_base::out | std::ios_base::binary);
-
-	bool thread1Finished = false, thread2Finished = false, thread1Writing = false, thread2Writing = false;
-
-	double endIndexD = (argslen + (2.f - 1.f)) / 2.f;
-	int endIndex = round(endIndexD);
-
-	arrinf.bundleName = bundleName;
-	arrinf.compressionType = compType;
-
-	int numCompressed = 0;
-
-	for (int i = 0; i < argslen; i++)
+	if (arrinf.arcC == ArchiveCompressionType::LZMA2)
 	{
-		std::ifstream file(inFiles[i].c_str(), std::ios::binary | std::ios::ate);
-		if (!file.good())
-			throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
-
-		// get size of file
-		size_t size = file.tellg();
-		if (size == 0 || size == -1)
+		compressedData = pag::LzmaUtil::Compress(buffer, size, outSize, compressionLevel);
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::LZ77)
+	{
+		std::string stringBuf((char*)buffer, size);
+		lz77::compress_t compress;
+		std::string compressed = compress.feed(stringBuf);
+		outSize = compressed.size();
+		compressedData = (uint8_t*)malloc(compressed.size());
+		memcpy(compressedData, compressed.data(), compressed.size());
+		compressed.clear();
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::FastAri)
+	{
+		uint64_t sizeOut = 0ULL;
+		std::vector<unsigned char> obuf;
+		int rc;
+		rc = FastAri::fa_compress_2013(buffer, obuf, size, &sizeOut);
+		if (rc)
 		{
-			std::cout << "File is null: " + inFiles[i] + " , skipped\n";
-			continue;
+			throw std::exception(("CRITICAL ERROR WHILE COMPRESSING: " + inFile).c_str());
 		}
-		file.seekg(0, std::ios::beg);
-		uint8_t* buffer = (uint8_t*)malloc(size);
-		// read content of infile
-		file.read((char*)buffer, size);
-
-		uint64_t outSize = 0;
-		uint8_t* compressedData = nullptr;
-
-		if (arrinf.compressionType == CompressionType::LZMA2)
+		if (obuf.size() >= size)
 		{
-			compressedData = pag::LzmaUtil::Compress(buffer, size, outSize, compressionLevel);
-		}
-		else if (arrinf.compressionType == CompressionType::LZ77)
-		{
-			std::string stringBuf((char*)buffer, size);
-			lz77::compress_t compress;
-			std::string compressed = compress.feed(stringBuf);
-			outSize = compressed.size();
-			compressedData = (uint8_t*)malloc(compressed.size());
-			memcpy(compressedData, compressed.data(), compressed.size());
-		}
-		else if (arrinf.compressionType == CompressionType::FastAri)
-		{
-			uint64_t sizeOut = 0ULL;
-			unsigned char* obuf = (unsigned char*)malloc(size * 1.5);
-			int rc;
-			rc = FastAri::fa_compress(buffer, obuf, size, &sizeOut,nullptr);
-			if (rc)
-			{
-				throw std::exception(("CRITICAL ERROR WHILE COMPRESSING: " + inFiles[i]).c_str());
-			}
-			if (sizeOut >= size)
-			{
-				memcpy(obuf, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = sizeOut;
-			}
-
-			compressedData = (uint8_t*)malloc(sizeOut);
-			memcpy(compressedData, obuf, sizeOut);
-			free(obuf);
-		}
-		else if (arrinf.compressionType == CompressionType::FastAri2013)
-		{
-			uint64_t sizeOut = 0ULL;
-			unsigned char* obuf = (unsigned char*)malloc(size * 1.5);
-			int rc;
-			rc = FastAri::fa_compress_2013(buffer, obuf, size, &sizeOut);
-			if (rc)
-			{
-				throw std::exception(("CRITICAL ERROR WHILE COMPRESSING: " + inFiles[i]).c_str());
-			}
-			if (sizeOut >= size)
-			{
-				memcpy(obuf, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = sizeOut;
-			}
-
-			compressedData = (uint8_t*)malloc(sizeOut);
-			memcpy(compressedData, obuf, sizeOut);
-			free(obuf);
-		}
-		else if (arrinf.compressionType == CompressionType::FPC)
-		{
-			unsigned char* obuf = (unsigned char*)malloc(size * 1.5);
-			uint64_t sizeOut = FPC_compress(obuf,buffer,size,0);
-			if (sizeOut >= size)
-			{
-				memcpy(obuf, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = sizeOut;
-			}
-
-			compressedData = (uint8_t*)malloc(sizeOut);
-			memcpy(compressedData, obuf, sizeOut);
-			free(obuf);
-		}
-		else if (arrinf.compressionType == CompressionType::MTAri)
-		{
-			file.close();
-			srand(time(NULL));
-			FILE* fn1;
-			fopen_s(&fn1,inFiles[i].c_str(), "rb+");
-			std::string tempPath2 = "";
-			FILE* fn2 = createTempFile("wb+",tempPath2);
-
-
-			int rc = MTAri::mtfa_compress(fn1,fn2,4,BUFSIZE);
-			fclose(fn1);
-			if (rc != EXIT_SUCCESS)
-			{
-				throw std::exception("CRITICAL COMPRESSION ERROR");
-			}
-
-			auto sizeOut = _ftelli64(fn2);
-			if (sizeOut >= size)
-			{
-				printf_s("Compression is bad\n");
-				fclose(fn2);
-				remove(tempPath2.c_str());
-				compressedData = (uint8_t*)malloc(size);
-				memcpy(compressedData, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				compressedData = (uint8_t*)malloc(sizeOut);
-				outSize = sizeOut;
-				fread(compressedData, sizeof(unsigned char), sizeOut, fn2);
-				fclose(fn2);
-				remove(tempPath2.c_str());
-			}
-		}
-		else if (arrinf.compressionType == CompressionType::Doboz)
-		{
-			uint8_t* tempMem = (uint8_t*)malloc(doboz::Compressor::getMaxCompressedSize(size));
-			doboz::Compressor compr;
-			size_t outsiz = 0;
-			doboz::Result res = compr.compress(buffer, size, tempMem, doboz::Compressor::getMaxCompressedSize(size),outsiz);
-			if (res == doboz::Result::RESULT_OK)
-			{
-				if (outsiz >= size)
-				{
-					compressedData = (uint8_t*)malloc(size);
-					memcpy(compressedData, buffer, size);
-					outSize = size;
-				}
-				else
-				{
-					outSize = outsiz;
-					compressedData = (uint8_t*)malloc(outsiz);
-					memcpy(compressedData, tempMem, outsiz);
-				}
-			}
-			else
-			{
-				throw std::exception(("Doboz compression failed, result: " + std::to_string(res)).c_str());
-			}
-			free(tempMem);
-		}
-		else if (arrinf.compressionType == CompressionType::LZJB)
-		{
-			auto maxOutSize = LZJB_MAX_COMPRESSED_SIZE(size);
-			auto tempMem = (uint8_t*)malloc(maxOutSize);
-			size_t outsiz = lzjb_compress(buffer, tempMem, size, maxOutSize);
-
-			if (outsiz >= size)
-			{
-				compressedData = (uint8_t*)malloc(size);
-				memcpy(compressedData, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = outsiz;
-				compressedData = (uint8_t*)malloc(outsiz);
-				memcpy(compressedData, tempMem, outsiz);
-			}
-			free(tempMem);
-		}
-		else if (arrinf.compressionType == CompressionType::LZSSE)
-		{
-			auto tempMem = (uint8_t*)malloc(size);
-			auto prs = LZSSE4_MakeOptimalParseState(size);
-			size_t outsiz = LZSSE4_CompressOptimalParse(prs, buffer, size, tempMem, size, compressionLevel);
-			LZSSE4_FreeOptimalParseState(prs);
-
-			if (outsiz >= size)
-			{
-				compressedData = (uint8_t*)malloc(size);
-				memcpy(compressedData, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = outsiz;
-				compressedData = (uint8_t*)malloc(outsiz);
-				memcpy(compressedData, tempMem, outsiz);
-			}
-			free(tempMem);
-		}
-		else if (arrinf.compressionType == CompressionType::BSC)
-		{
-			auto tempMem = (uint8_t*)malloc(size + LIBBSC_HEADER_SIZE);
-			int coder = 0;
-			if (compressionLevel <= 3)
-			{
-				coder = LIBBSC_CODER_QLFC_FAST;
-			}
-			else if(compressionLevel <= 6)
-			{
-				coder = LIBBSC_CODER_QLFC_STATIC;
-			}
-			else if (compressionLevel <= 9)
-			{
-				coder = LIBBSC_CODER_QLFC_ADAPTIVE;
-			}
-			size_t outsiz = bsc_compress(buffer, tempMem, size, 16, 64, 1, coder,  LIBBSC_FEATURE_MULTITHREADING);
-
-			if (outsiz >= size)
-			{
-				compressedData = (uint8_t*)malloc(size);
-				memcpy(compressedData, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = outsiz;
-				compressedData = (uint8_t*)malloc(outsiz);
-				memcpy(compressedData, tempMem, outsiz);
-			}
-			free(tempMem);
-		}
-		else if (arrinf.compressionType == CompressionType::LZP)
-		{
-			auto tempMem = (uint8_t*)malloc(size + LIBBSC_HEADER_SIZE);
-			int coder = 0;
-			if (compressionLevel <= 3)
-			{
-				coder = LIBBSC_CODER_QLFC_FAST;
-			}
-			else if (compressionLevel <= 6)
-			{
-				coder = LIBBSC_CODER_QLFC_STATIC;
-			}
-			else if (compressionLevel <= 9)
-			{
-				coder = LIBBSC_CODER_QLFC_ADAPTIVE;
-			}
-			size_t outsiz = bsc_lzp_compress(buffer, tempMem, size, 0x400, 64, LIBBSC_FEATURE_MULTITHREADING);
-
-			if (outsiz >= size)
-			{
-				compressedData = (uint8_t*)malloc(size);
-				memcpy(compressedData, buffer, size);
-				outSize = size;
-			}
-			else
-			{
-				outSize = outsiz;
-				compressedData = (uint8_t*)malloc(outsiz);
-				memcpy(compressedData, tempMem, outsiz);
-			}
-			free(tempMem);
-		}
-
-		if (arrinf.compressionType == CompressionType::NoCompression)
-		{
-			std::cout << "Compressed file: " + inFiles[i] + "\n Size: " + std::to_string(outSize) + "\n";
-
-			fs.write((char*)buffer, size);
-			free(buffer);
-
-			fs.seekp(0, std::ios_base::end);
-			uint64_t endPos = fs.tellp();
-			arrinf.fileMap.insert(std::pair<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>>(getRelative(inFiles[i], relativeTo), std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>(size, std::pair<unsigned long long, unsigned long long>(endPos - size, size))));  // это сука пиздец блять а не карта
-			file.close();
-			numCompressed += 1;
+			obuf.clear();
+			outSize = size;
+			sizeOut = size;
+			compressedData = (uint8_t*)malloc(size);
+			memcpy(compressedData, buffer, size);
 		}
 		else
 		{
-			free(buffer);
-			std::cout << "Compressed file: " + inFiles[i] + "\n Size: " + std::to_string(outSize) + "\n";
+			outSize = obuf.size();
+			compressedData = (uint8_t*)malloc(obuf.size());
+			memcpy(compressedData, obuf.data(), obuf.size());
+			obuf.clear();
+		}
 
-			fs.write((char*)compressedData, outSize);
-			free(compressedData);
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::LZJB)
+	{
+		auto maxOutSize = LZJB_MAX_COMPRESSED_SIZE(size);
+		auto tempMem = (uint8_t*)malloc(maxOutSize);
+		size_t outsiz = lzjb_compress(buffer, tempMem, size, maxOutSize);
 
-			fs.seekp(0, std::ios_base::end);
-			uint64_t endPos = fs.tellp();
-			arrinf.fileMap.insert(std::pair<std::string, std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>>(getRelative(inFiles[i], relativeTo), std::pair<unsigned long long, std::pair<unsigned long long, unsigned long long>>(size, std::pair<unsigned long long, unsigned long long>(endPos - outSize, outSize))));  // это сука пиздец блять а не карта
-			if(file.is_open())
-				file.close();
-			
-			numCompressed += 1;
+		if (outsiz >= size)
+		{
+			compressedData = (uint8_t*)malloc(size);
+			memcpy(compressedData, buffer, size);
+			outSize = size;
+		}
+		else
+		{
+			outSize = outsiz;
+			compressedData = (uint8_t*)malloc(outsiz);
+			memcpy(compressedData, tempMem, outsiz);
+		}
+		free(tempMem);
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::LZSSE)
+	{
+		auto tempMem = (uint8_t*)malloc(size);
+		auto prs = LZSSE4_MakeOptimalParseState(size);
+		size_t outsiz = LZSSE4_CompressOptimalParse(prs, buffer, size, tempMem, size, compressionLevel);
+		LZSSE4_FreeOptimalParseState(prs);
+
+		if (outsiz >= size)
+		{
+			compressedData = (uint8_t*)malloc(size);
+			memcpy(compressedData, buffer, size);
+			outSize = size;
+		}
+		else
+		{
+			outSize = outsiz;
+			compressedData = (uint8_t*)malloc(outsiz);
+			memcpy(compressedData, tempMem, outsiz);
+		}
+		free(tempMem);
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::BSC)
+	{
+		auto tempMem = (uint8_t*)malloc(size + LIBBSC_HEADER_SIZE);
+		int coder = 0;
+		if (compressionLevel <= 3)
+		{
+			coder = LIBBSC_CODER_QLFC_FAST;
+		}
+		else if (compressionLevel <= 6)
+		{
+			coder = LIBBSC_CODER_QLFC_STATIC;
+		}
+		else if (compressionLevel <= 9)
+		{
+			coder = LIBBSC_CODER_QLFC_ADAPTIVE;
+		}
+		size_t outsiz = bsc_compress(buffer, tempMem, size, 16, 64, 1, coder, LIBBSC_FEATURE_MULTITHREADING);
+
+		if (outsiz >= size)
+		{
+			compressedData = (uint8_t*)malloc(size);
+			memcpy(compressedData, buffer, size);
+			outSize = size;
+		}
+		else
+		{
+			outSize = outsiz;
+			compressedData = (uint8_t*)malloc(outsiz);
+			memcpy(compressedData, tempMem, outsiz);
+		}
+		free(tempMem);
+	}
+	else if (arrinf.arcC == ArchiveCompressionType::LZP)
+	{
+		auto tempMem = (uint8_t*)malloc(size + LIBBSC_HEADER_SIZE);
+		int coder = 0;
+		if (compressionLevel <= 3)
+		{
+			coder = LIBBSC_CODER_QLFC_FAST;
+		}
+		else if (compressionLevel <= 6)
+		{
+			coder = LIBBSC_CODER_QLFC_STATIC;
+		}
+		else if (compressionLevel <= 9)
+		{
+			coder = LIBBSC_CODER_QLFC_ADAPTIVE;
+		}
+		size_t outsiz = bsc_lzp_compress(buffer, tempMem, size, 0x400, 64, LIBBSC_FEATURE_MULTITHREADING);
+
+		if (outsiz >= size)
+		{
+			compressedData = (uint8_t*)malloc(size);
+			memcpy(compressedData, buffer, size);
+			outSize = size;
+		}
+		else
+		{
+			outSize = outsiz;
+			compressedData = (uint8_t*)malloc(outsiz);
+			memcpy(compressedData, tempMem, outsiz);
+		}
+		free(tempMem);
+	}
+}
+
+std::mutex mtx;
+
+void CompressionTask(ArchiveInfo& arrinf, std::vector<std::string>& tempFilesPaths, std::atomic<int>& numCompressed, uint32_t& prevCrc, uint32_t& numRunningThreads, std::string filePath, bool buildHash, std::string relativeTo, int compressionLevel)
+{
+	if (arrinf.arcC == ArchiveCompressionType::NoCompression)
+	{
+		return;
+	}
+
+	numRunningThreads++;
+
+	uint64_t outsize = 0;
+	uint8_t* compressedData = nullptr;
+
+	std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+	if (!file.good())
+		throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
+
+	// get size of file
+	size_t size = file.tellg();
+	if (size == 0 || size == -1)
+	{
+		std::cout << "File is null: " + filePath + " , skipped\n";
+		return;
+	}
+	file.seekg(0, std::ios::beg);
+	uint8_t* buffer = (uint8_t*)malloc(size);
+	// read content of infile
+	file.read((char*)buffer, size);
+
+	uint32_t table[256];
+	generate_table(table);
+
+
+	CompressFile(filePath, buffer, size, arrinf, compressionLevel, compressedData, outsize);
+	free(buffer);
+	std::cout << "Compressed file: " + filePath + "\n Size: " + std::to_string(outsize) + "\n";
+
+	std::string fpath = filePath + "." + std::to_string(size);
+	std::ofstream tempOut(fpath, std::ios_base::out | std::ios_base::binary);
+	assert(compressedData != nullptr);
+
+	tempOut.write((char*)compressedData, outsize);
+	tempOut.close();
+
+	free(compressedData);
+	if (file.is_open())
+		file.close();
+
+	std::lock_guard<std::mutex> lck(mtx);
+	tempFilesPaths.push_back(fpath);
+	numCompressed += 1;
+	numRunningThreads--;
+}
+
+
+bool compareFunction(std::string a, std::string b) { return a < b; }
+
+AssetBundle::AssetBundle(std::string bundleName, int compressionLevel, ArchiveCompressionType compType, bool buildHash, std::string relativeTo, std::string* inFiles, int argslen) //Compression 0-9 for lzma2, for others 0-12
+{
+	bsc_init(LIBBSC_FEATURE_MULTITHREADING);
+
+	arrinf.bundleName = bundleName;
+	arrinf.arcC = compType;
+	arrinf.buildHash = buildHash;
+
+	std::atomic<int> numCompressed = 0;
+
+	std::vector<std::string> tempFilesPaths = {};
+
+	uint32_t prevCrc = 0;
+	std::vector<std::thread> threads;
+	unsigned int currentNumRunningThreads = 0;
+
+	if (compType == ArchiveCompressionType::FastAri || compType == ArchiveCompressionType::LZJB || compType == ArchiveCompressionType::LZP || compType == ArchiveCompressionType::LZ77 || compType == ArchiveCompressionType::BSC)
+	{
+		for (int i = 0; i < argslen; i++)
+		{
+			std::thread cth(CompressionTask, std::ref(arrinf), std::ref(tempFilesPaths), std::ref(numCompressed), std::ref(prevCrc),std::ref(currentNumRunningThreads), inFiles[i], buildHash, relativeTo, compressionLevel);
+			threads.emplace_back(std::move(cth));
+		}
+		auto processor_count = std::thread::hardware_concurrency();
+
+		for (int i = 0; i < threads.size(); i++)
+		{
+			threads[i].detach();
+			while (currentNumRunningThreads == processor_count * 2) // wait for a few tasks to reduce memory usage
+			{
+
+			}
+		}
+
+		while (numCompressed != argslen)
+		{
+			//Wait
+		}
+		threads.clear();
+	}
+	else if(compType == NoCompression)
+	{
+		numCompressed = argslen;
+	}
+	else
+	{
+		try
+		{
+			for (int i = 0; i < argslen; i++)
+			{
+				CompressionTask(std::ref(arrinf), std::ref(tempFilesPaths), std::ref(numCompressed), std::ref(prevCrc), currentNumRunningThreads, inFiles[i], buildHash, relativeTo, compressionLevel);
+			}
+		}
+		catch (const std::exception&)
+		{
+			for (auto filePath : tempFilesPaths)
+			{
+				if (fs::exists(filePath))
+				{
+					std::remove(filePath.c_str());
+				}
+			}
+			throw;
 		}
 	}
 
 	std::cout << "Compressed " + std::to_string(numCompressed) + " files out of " + std::to_string(argslen) + "\n";
 
+	uint64_t previousPosition = 0;
+	uint32_t table[256];
+	generate_table(table);
+
+	if (compType == NoCompression)
+	{
+		for (int i = 0; i < argslen; i++)
+		{
+			std::ifstream file(inFiles[i], std::ios::binary | std::ios::ate);
+			if (!file.good())
+				throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
+
+			// get size of file
+			size_t size = file.tellg();
+			if (size == 0 || size == -1)
+			{
+				std::cout << "File is null: " + inFiles[i] + " , skipped\n";
+				return;
+			}
+			file.seekg(0, std::ios::beg);
+			uint8_t* buffer = (uint8_t*)malloc(size);
+			// read content of infile
+			file.read((char*)buffer, size);
+
+			if (buildHash)
+			{
+				uint32_t crc = updateCRC(table, prevCrc, buffer, size);
+				prevCrc = crc;
+
+				arrinf.filesInfo.push_back(ArchiveFileInfo(getRelative(inFiles[i], relativeTo), size, previousPosition, size, crc));
+			}
+			else
+			{
+				arrinf.filesInfo.push_back(ArchiveFileInfo(getRelative(inFiles[i], relativeTo), size, previousPosition, size, 0));
+			}
+			previousPosition += size;
+			free(buffer);
+			std::cout << "Compressed file: " + inFiles[i] + "\n Size: " + std::to_string(size) + "\n";
+			numCompressed += 1;
+		}
+	}
+	else
+	{
+		std::sort(tempFilesPaths.begin(), tempFilesPaths.end(), compareFunction);//sort the vector
+
+		for (auto filePath : tempFilesPaths)
+		{
+			size_t lastindex = filePath.find_last_of(".");
+			auto fpath = filePath.substr(0, lastindex);
+
+			std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+			if (!file.good())
+				throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
+
+			// get size of file
+			size_t compsize = file.tellg();
+			if (compsize == 0 || compsize == -1)
+			{
+				std::cout << "File is null: " + filePath + " , skipped\n";
+				return;
+			}
+			file.seekg(0, std::ios::beg);
+			uint8_t* compressedData = (uint8_t*)malloc(compsize);
+			// read content of infile
+			file.read((char*)compressedData, compsize);
+
+			std::cout << "Writing file info: " + filePath + "\n";
+
+			auto ext = std::filesystem::path(filePath).extension().string();
+			ext.erase(std::remove(ext.begin(), ext.end(), '.'), ext.end());
+			std::cout << ext + "\n";
+
+			if (buildHash)
+			{
+				uint32_t crc = updateCRC(table, prevCrc, compressedData, compsize);
+				prevCrc = crc;
+
+				arrinf.filesInfo.push_back(ArchiveFileInfo(getRelative(fpath, relativeTo), std::stoull(ext), previousPosition, compsize, crc));
+			}
+			else
+			{
+				arrinf.filesInfo.push_back(ArchiveFileInfo(getRelative(fpath, relativeTo), std::stoull(ext), previousPosition, compsize, 0));
+			}
+			free(compressedData);
+			previousPosition += compsize;
+		}
+	}
+
+
+	std::ofstream fs(bundleName, std::ios_base::out | std::ios_base::binary);
 	std::string binfo = SerializeInfo(this->arrinf);
-	fs.write(binfo.data(), binfo.length());
 	int headerLength = binfo.length();
+	fs.write("YPK", 3);
 	fs.write(reinterpret_cast<char*>(&headerLength), sizeof(int));
+
+	for (auto& omg : arrinf.filesInfo)
+	{
+		omg.startPosition += (3 + sizeof(int) + (uint64_t)headerLength);
+	}
+	binfo = SerializeInfo(this->arrinf);
+	fs.write(binfo.data(), binfo.length());
+
+	if (arrinf.arcC == NoCompression)
+	{
+		for (int i = 0; i < argslen; i++)
+		{
+			std::ifstream file(inFiles[i], std::ios::binary | std::ios::ate);
+			if (!file.good())
+				throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
+
+			// get size of file
+			size_t size = file.tellg();
+			if (size == 0 || size == -1)
+			{
+				std::cout << "File is null: " + inFiles[i] + " , skipped\n";
+				continue;
+			}
+			file.seekg(0, std::ios::beg);
+			char* buffer = (char*)malloc(size);
+			// read content of infile
+			file.read(buffer, size);
+			fs.write(buffer, size);
+			free(buffer);
+		}
+	}
+	else
+	{
+		for (auto filePath : tempFilesPaths)
+		{
+			std::cout << "Writing file to stream: " + filePath + "\n";
+			std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+			if (!file.good())
+				throw std::exception("File doesnt exists or it is unaccsesible to YupGamesArchive");
+
+			// get size of file
+			size_t size = file.tellg();
+			if (size == 0 || size == -1)
+			{
+				std::cout << "File is null: " + filePath + " , skipped\n";
+				continue;
+			}
+			file.seekg(0, std::ios::beg);
+			char* buffer = (char*)malloc(size);
+
+			// read content of infile
+			file.read(buffer, size);
+			fs.write(buffer, size);
+			free(buffer);
+			file.close();
+
+			if (DeleteFileA(filePath.c_str()) == 0)
+			{
+				std::cout << GetLastError();
+				std::cout << "\n";
+			}
+		}
+	}
+
 	fs.close();
-	bundleFile = std::fstream(bundleName, std::ios_base::ate | std::ios_base::binary | std::ios_base::in | std::ios_base::out);
+	bundleFile = std::fstream(bundleName, std::ios_base::binary | std::ios_base::in | std::ios_base::out);
 }
+
 AssetBundle::AssetBundle(std::string bundlePath)
 {
 	bsc_init( LIBBSC_FEATURE_MULTITHREADING);
@@ -451,14 +587,14 @@ AssetBundle::AssetBundle(std::string bundlePath)
 	{
 		throw std::invalid_argument("File does not exsist! File:" + bundlePath);
 	}
-	bundleFile = std::fstream(bundlePath, std::ios_base::ate | std::ios_base::binary | std::ios_base::in | std::ios_base::out);
+	bundleFile = std::fstream(bundlePath, std::ios_base::binary | std::ios_base::in | std::ios_base::out);
 
-	uint64_t length = bundleFile.tellg();
+	bundleFile.seekg(3);
 
 	int headerLength = 0;
-	bundleFile.seekg(length - sizeof(int));
 	bundleFile.read(reinterpret_cast<char*>(&headerLength), sizeof(int));
-	bundleFile.seekg((uint64_t)(length - sizeof(int) - headerLength));
+
+	bundleFile.seekg((uint64_t)(sizeof(int)) + 3);
 	char* binfo = new char[headerLength];
 	bundleFile.read(binfo, headerLength);
 
@@ -466,6 +602,7 @@ AssetBundle::AssetBundle(std::string bundlePath)
 	arrinf = DeserializeInfo(bundleInfo);
 	bundleFile.seekg(0, bundleFile.beg);
 }
+
 void AssetBundle::Close()
 {
 	bundleFile.close();
@@ -474,13 +611,14 @@ void AssetBundle::Close()
 std::vector<std::string> AssetBundle::ListFiles()
 {
 	std::vector<std::string> fileNames;
-	for (auto val : this->arrinf.fileMap)
+	for (auto val : this->arrinf.filesInfo)
 	{
-		fileNames.push_back(val.first);
+		fileNames.push_back(val.name);
 	}
 
 	return fileNames;
 }
+
 int dirExists(const char* path)
 {
 	struct stat info;
@@ -493,20 +631,29 @@ int dirExists(const char* path)
 		return 0;
 }
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+	if (from.empty())
+		return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+}
 
 void AssetBundle::ExtractToDirectory(std::string extTo) // extto needs to be with \\ or / at the end
 {
+	fs::create_directory(fs::current_path().string() + extTo);
 	for (auto f : this->ListFiles())
 	{
-		std::string filePath = extTo + f;
-		std::filesystem::path dirPath = filePath.substr(0, filePath.find_last_of("\\/"));
+		std::string fc = fs::current_path().string() + extTo + f;
+		replaceAll(fc, "\\", "/");
+		std::cout << fc + "\r\n";
+		std::filesystem::path filepath = fs::path(fc);
+		auto parentPath = filepath.parent_path();
+		fs::create_directory(parentPath);
 
-		if (dirExists(dirPath.generic_string().c_str()) == 0)
-		{
-			std::filesystem::create_directory(dirPath);
-		}
-
-		std::ofstream out(filePath, std::ios_base::out | std::ios_base::binary);
+		std::ofstream out(filepath, std::ios_base::out | std::ios_base::binary);
 
 		uint64_t outSize = 0;
 		auto decomp = this->ReadData(f.c_str(), outSize);
@@ -521,8 +668,10 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 {
 	auto files = this->ListFiles();
 	bool found = false;
+	int fileIndex = -1;
 	for (auto file : files)
 	{
+		fileIndex++;
 		if (file == fileName)
 		{
 			found = true;
@@ -534,23 +683,23 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 		throw std::exception(("File doesnt exists in archive: " + std::string(fileName)).c_str());
 		return nullptr;
 	}
-	auto dataPair = this->arrinf.fileMap.at(std::string(fileName));
+	auto dataPair = this->arrinf.filesInfo.at(fileIndex);
 
 	bundleFile.seekg(0, bundleFile.beg);
-	unsigned long long size = dataPair.second.second;
+	unsigned long long size = dataPair.compressedSize;
 	char* segment = (char*)malloc(size);
-	bundleFile.seekg(dataPair.second.first);
+	bundleFile.seekg(dataPair.startPosition);
 	bundleFile.read(segment, size);
 
 	std::cout << "Begin decompressing... \n";
 	std::cout << "File length: " + std::to_string(size) + "\n";
 
 	uint8_t* decompressed = nullptr;
-	if (arrinf.compressionType == CompressionType::LZMA2)
+	if (arrinf.arcC == ArchiveCompressionType::LZMA2)
 	{
 		decompressed = pag::LzmaUtil::Decompress((uint8_t*)segment, size, outSize);
 	}
-	else if (arrinf.compressionType == CompressionType::LZ77)
+	else if (arrinf.arcC == ArchiveCompressionType::LZ77)
 	{
 		unsigned long long outBufferSize = 0;
 
@@ -568,125 +717,37 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 		memcpy(decompressed, uncompressed.data(), outBufferSize);
 
 	}
-	else if(arrinf.compressionType == CompressionType::FastAri)
+	else if (arrinf.arcC == ArchiveCompressionType::FastAri)
 	{
-		if (dataPair.first == dataPair.second.second)
+		if (dataPair.uncompressedSize == dataPair.compressedSize)
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			memcpy(decompressed, segment, dataPair.uncompressedSize);
+			outSize = dataPair.uncompressedSize;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			int rc = FastAri::fa_decompress((unsigned char*)segment, decompressed, size, dataPair.first,nullptr);
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			int rc = FastAri::fa_decompress_2013((unsigned char*)segment, decompressed, size, dataPair.uncompressedSize);
 			if (rc != 0)
 			{
 				throw std::exception(("CRITICAL ERROR WHILE DECOMPRESSING: " + std::string(fileName) + ", CODE: " + std::to_string(rc)).c_str());
 			}
-			outSize = dataPair.first;
+			outSize = dataPair.uncompressedSize;
 		}
 	}
-	else if (arrinf.compressionType == CompressionType::FastAri2013)
+	else if (arrinf.arcC == ArchiveCompressionType::LZSSE)
 	{
-		if (dataPair.first == dataPair.second.second)
+		if (dataPair.uncompressedSize == dataPair.compressedSize)
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			memcpy(decompressed, segment, dataPair.uncompressedSize);
+			outSize = dataPair.uncompressedSize;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			int rc = FastAri::fa_decompress_2013((unsigned char*)segment, decompressed, size, dataPair.first);
-			if (rc != 0)
-			{
-				throw std::exception(("CRITICAL ERROR WHILE DECOMPRESSING: " + std::string(fileName) + ", CODE: " + std::to_string(rc)).c_str());
-			}
-			outSize = dataPair.first;
-		}
-	}
-	else if (arrinf.compressionType == CompressionType::FPC)
-	{
-		if (dataPair.first == dataPair.second.second)
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
-		}
-		else
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			outSize = FPC_decompress(decompressed,dataPair.first,segment,size);
-			if (outSize != dataPair.first)
-			{
-				throw std::exception("FPC FAILED DECOMPRESSION");
-			}
-			outSize = dataPair.first;
-		}
-	}
-	else if (arrinf.compressionType == CompressionType::MTAri)
-	{
-		std::cout << "Uncompressed size is: " + std::to_string(dataPair.first) + " , " + " compressed is: " + std::to_string(dataPair.second.second) + "\n";
-		if (dataPair.first == dataPair.second.second)
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
-		}
-		else
-		{
-			std::string tmp1 = "";
-			std::string tmp2 = "";
-			FILE* f1 = createTempFile("wb+",tmp1);
-			std::cout << "Bytes written: " + std::to_string(fwrite(segment, sizeof(char), size, f1)) + "\n";
-			FILE* f2 = createTempFile("wb+",tmp2);
-			int rc = MTAri::mtfa_decompress(f1, f2, 4);
-			fclose(f1);
-			remove(tmp1.c_str());
-
-			if (rc != EXIT_SUCCESS)
-			{
-				throw std::exception("CRITICAL DECOMPRESSION ERROR");
-			}
-			auto sizeOut = _ftelli64(f2);
-			outSize = sizeOut;
-			decompressed = (uint8_t*)malloc(sizeOut);
-			std::cout << "Bytes read: " + std::to_string(fread(decompressed, sizeof(unsigned char), sizeOut, f2)) + "\n";
-			fclose(f2);
-		}
-	}
-	else if (arrinf.compressionType == CompressionType::Doboz)
-	{
-		if (dataPair.first == dataPair.second.second)
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-		}
-		else
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			doboz::Decompressor dec;
-			auto res = dec.decompress(segment, size, decompressed, dataPair.first);
-			if (res != doboz::Result::RESULT_OK)
-			{
-				throw std::exception(("Doboz decompression failed, result: " + std::to_string(res)).c_str());
-			}
-		}
-		outSize = dataPair.first;
-	}
-	else if (arrinf.compressionType == CompressionType::LZSSE)
-	{
-		if (dataPair.first == dataPair.second.second)
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
-		}
-		else
-		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			size_t outSiz = LZSSE4_Decompress(segment, size,decompressed,dataPair.first);
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			size_t outSiz = LZSSE4_Decompress(segment, size,decompressed,dataPair.uncompressedSize);
 			if (outSiz != NULL)
 			{
 				outSize = outSiz;
@@ -697,17 +758,17 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 			}
 		}
 	}
-	else if (arrinf.compressionType == CompressionType::LZJB)
+	else if (arrinf.arcC == ArchiveCompressionType::LZJB)
 	{
-		if (dataPair.first == dataPair.second.second)
+		if (dataPair.uncompressedSize == dataPair.compressedSize)
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			memcpy(decompressed, segment, dataPair.uncompressedSize);
+			outSize = dataPair.uncompressedSize;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
 			size_t outSiz = 0;
 			auto res = lzjb_decompress((unsigned char*)segment, decompressed, size, &outSiz);
 			if (res != LZJB_OK)
@@ -720,18 +781,18 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 			}
 		}
 	}
-	else if (arrinf.compressionType == CompressionType::BSC)
+	else if (arrinf.arcC == ArchiveCompressionType::BSC)
 	{
-		if (dataPair.first == dataPair.second.second)
+		if (dataPair.uncompressedSize == dataPair.compressedSize)
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			memcpy(decompressed, segment, dataPair.uncompressedSize);
+			outSize = dataPair.uncompressedSize;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			auto res = bsc_decompress((unsigned char*)segment,size, decompressed,dataPair.first,  LIBBSC_FEATURE_MULTITHREADING);
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			auto res = bsc_decompress((unsigned char*)segment,size, decompressed,dataPair.uncompressedSize,  LIBBSC_FEATURE_MULTITHREADING);
 			if (res < LIBBSC_NO_ERROR)
 			{
 				{
@@ -750,21 +811,21 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 			}
 			else
 			{
-				outSize = dataPair.first;
+				outSize = dataPair.uncompressedSize;
 			}
 		}
 	}
-	else if (arrinf.compressionType == CompressionType::LZP)
+	else if (arrinf.arcC == ArchiveCompressionType::LZP)
 	{
-		if (dataPair.first == dataPair.second.second)
+		if (dataPair.uncompressedSize == dataPair.compressedSize)
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
-			memcpy(decompressed, segment, dataPair.first);
-			outSize = dataPair.first;
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
+			memcpy(decompressed, segment, dataPair.uncompressedSize);
+			outSize = dataPair.uncompressedSize;
 		}
 		else
 		{
-			decompressed = (uint8_t*)malloc(dataPair.first);
+			decompressed = (uint8_t*)malloc(dataPair.uncompressedSize);
 			auto res = bsc_lzp_decompress((unsigned char*)segment, decompressed, size, 0x400,64, LIBBSC_FEATURE_MULTITHREADING);
 			if (res < LIBBSC_NO_ERROR)
 			{
@@ -784,11 +845,11 @@ uint8_t* AssetBundle::ReadData(const char* fileName, uint64_t &outSize)
 			}
 			else
 			{
-				outSize = dataPair.first;
+				outSize = dataPair.uncompressedSize;
 			}
 		}
 	}
-	else if (arrinf.compressionType == CompressionType::NoCompression)
+	else if (arrinf.arcC == ArchiveCompressionType::NoCompression)
 	{
 		decompressed = (uint8_t*)malloc(size);
 		memcpy(decompressed,segment,size);

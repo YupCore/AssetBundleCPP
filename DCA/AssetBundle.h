@@ -29,7 +29,7 @@ extern "C++"
 
 		ArchiveInfo arrinf;
 
-		AssetBundle(std::string bundleName, int compressionLevel, CompressionType compType, std::string relativeTo, std::string* inFiles, int argslen); //Create new bundle
+		AssetBundle(std::string bundleName, int compressionLevel, ArchiveCompressionType compType, bool buildHash, std::string relativeTo, std::string* inFiles, int argslen); //Create new bundle
 		AssetBundle(std::string bundlePath); //Open already created bundle
 		void Close();
 		void ExtractToDirectory(std::string extractTo);

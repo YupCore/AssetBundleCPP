@@ -1,45 +1,35 @@
 ﻿  AssetBundle.cpp
-I:\source\repos\DCA\DCA\AssetBundle.h(28,16): warning C4251: AssetBundle::bundleFile: class "std::basic_fstream<char,std::char_traits<char>>" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
-I:\vs2022\VC\Tools\MSVC\14.30.30705\include\iosfwd(230): message : см. объявление "std::basic_fstream<char,std::char_traits<char>>"
-I:\source\repos\DCA\DCA\AssetBundle.h(30,15): warning C4251: AssetBundle::arrinf: struct "ArchiveInfo" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
-I:\source\repos\DCA\DCA\ArchiveInfo.h(22): message : см. объявление "ArchiveInfo"
-I:\source\repos\DCA\DCA\compressionTypes\lz77\lz77.h(175,27): warning C4267: =: преобразование из "size_t" в "uint16_t"; возможна потеря данных
-I:\source\repos\DCA\DCA\compressionTypes\fastari\MTAri.h(3,1): warning C4005: _CRT_SECURE_NO_WARNINGS: изменение макроопределения
-I:\source\repos\DCA\DCA\AssetBundle.cpp : message : см. предыдущее определение "_CRT_SECURE_NO_WARNINGS"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(100,22): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(123,14): warning C4273: AssetBundle::AssetBundle: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(32,3): message : см. предыдущее определение "{ctor}"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(131,15): warning C4244: инициализация: преобразование "double" в "int", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(175,54): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(199,54): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(222,54): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(241,14): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(256,16): warning C4018: >=: несоответствие типов со знаком и без знака
-I:\source\repos\DCA\DCA\AssetBundle.cpp(358,104): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(390,100): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(442,35): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(447,14): warning C4273: AssetBundle::AssetBundle: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(33,3): message : см. предыдущее определение "{ctor}"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(469,19): warning C4273: AssetBundle::Close: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(34,8): message : см. предыдущее определение "Close"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(474,39): warning C4273: AssetBundle::ListFiles: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(36,28): message : см. предыдущее определение "ListFiles"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(497,19): warning C4273: AssetBundle::ExtractToDirectory: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(35,8): message : см. предыдущее определение "ExtractToDirectory"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(520,23): warning C4273: AssetBundle::ReadData: несовместимое связывание dll
-I:\source\repos\DCA\DCA\AssetBundle.h(37,12): message : см. предыдущее определение "ReadData"
-I:\source\repos\DCA\DCA\AssetBundle.cpp(734,81): warning C4244: аргумент: преобразование "_Ty1" в "int", возможна потеря данных
-          with
-          [
-              _Ty1=unsigned __int64
-          ]
-I:\source\repos\DCA\DCA\AssetBundle.cpp(734,54): warning C4244: аргумент: преобразование "unsigned __int64" в "int", возможна потеря данных
-I:\source\repos\DCA\DCA\AssetBundle.cpp(768,73): warning C4244: аргумент: преобразование "unsigned __int64" в "int", возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.h(28,16): warning C4251: AssetBundle::bundleFile: class "std::basic_fstream<char,std::char_traits<char>>" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
+D:\DevTools\VS2022\VC\Tools\MSVC\14.34.31933\include\iosfwd(245,23): message : см. объявление "std::basic_fstream<char,std::char_traits<char>>"
+E:\source\repos\DCA\DCA\AssetBundle.h(30,15): warning C4251: AssetBundle::arrinf: struct "ArchiveInfo" должен иметь dll-интерфейс для использования клиентами class "AssetBundle"
+E:\source\repos\DCA\DCA\ArchiveInfo.h(45,8): message : см. объявление "ArchiveInfo"
+E:\source\repos\DCA\DCA\compressionTypes\lz77\lz77.h(175,27): warning C4267: =: преобразование из "size_t" в "uint16_t"; возможна потеря данных
+E:\source\repos\DCA\DCA\compressionTypes\fastari\MTAri.h(3,1): warning C4005: _CRT_SECURE_NO_WARNINGS: изменение макроопределения
+E:\source\repos\DCA\DCA\compressionTypes\fastari\MTAri.h(3,1): message : "_CRT_SECURE_NO_WARNINGS" ранее объявлен в командной строке
+E:\source\repos\DCA\DCA\AssetBundle.cpp(122,22): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(245,49): warning C4244: аргумент: преобразование "uint64_t" в "int", возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(277,53): warning C4244: аргумент: преобразование "uint64_t" в "int", возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(353,14): warning C4273: AssetBundle::AssetBundle: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(32,3): message : см. предыдущее определение "{ctor}"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(512,35): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(583,14): warning C4273: AssetBundle::AssetBundle: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(33,3): message : см. предыдущее определение "{ctor}"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(606,19): warning C4273: AssetBundle::Close: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(34,8): message : см. предыдущее определение "Close"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(611,39): warning C4273: AssetBundle::ListFiles: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(36,28): message : см. предыдущее определение "ListFiles"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(644,19): warning C4273: AssetBundle::ExtractToDirectory: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(35,8): message : см. предыдущее определение "ExtractToDirectory"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(667,23): warning C4273: AssetBundle::ReadData: несовместимое связывание dll
+E:\source\repos\DCA\DCA\AssetBundle.h(37,12): message : см. предыдущее определение "ReadData"
+E:\source\repos\DCA\DCA\AssetBundle.cpp(795,81): warning C4244: аргумент: преобразование "uint64_t" в "int", возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(795,54): warning C4244: аргумент: преобразование "unsigned __int64" в "int", возможна потеря данных
+E:\source\repos\DCA\DCA\AssetBundle.cpp(829,73): warning C4244: аргумент: преобразование "unsigned __int64" в "int", возможна потеря данных
 LINK : warning LNK4044: нераспознанный параметр "/Zc:preprocessor"; игнорируется
-     Создается библиотека I:\source\repos\DCA\x64\Release\YupGamesArchive.lib и объект I:\source\repos\DCA\x64\Release\YupGamesArchive.exp
+     Создается библиотека E:\source\repos\DCA\x64\Release\YupGamesArchive.lib и объект E:\source\repos\DCA\x64\Release\YupGamesArchive.exp
   Создание кода
-  25 of 2254 functions ( 1.1%) were compiled, the rest were copied from previous compilation.
+  0 of 2166 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    23 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Создание кода завершено
-  DCA.vcxproj -> I:\source\repos\DCA\x64\Release\YupGamesArchive.dll
+  DCA.vcxproj -> E:\source\repos\DCA\x64\Release\YupGamesArchive.dll

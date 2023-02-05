@@ -317,7 +317,7 @@ int FastAri::fa_decompress_safe(const unsigned char* ibuf, unsigned char* obuf, 
 #endif
 }
 
-int FastAri::fa_compress_2013(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t* olen)
+int FastAri::fa_compress_2013(const unsigned char* ibuf, std::vector<unsigned char>& obuf, size_t ilen, size_t* olen)
 {
 	unsigned int low = 0, mid, high = 0xFFFFFFFF;
 	size_t ipos, opos = 0;
@@ -345,21 +345,28 @@ int FastAri::fa_compress_2013(const unsigned char* ibuf, unsigned char* obuf, si
 			}
 			bv >>= 1;
 			while ((high ^ low) < 0x1000000) {
-				obuf[opos] = high >> 24;
-				++opos;
+				//obuf[opos] = high >> 24;
+				//++opos;
+				obuf.push_back(high >> 24);
 				high = (high << 8) | 0xFF;
 				low <<= 8;
 			}
 		}
 	}
 	/* Flush coder */
-	obuf[opos] = (high >> 24); ++opos;
-	obuf[opos] = (high >> 16) & 0xFF; ++opos;
-	obuf[opos] = (high >> 8) & 0xFF; ++opos;
-	obuf[opos] = high & 0xFF; ++opos;
+	//obuf[opos] = (high >> 24); ++opos;
+	//obuf[opos] = (high >> 16) & 0xFF; ++opos;
+	//obuf[opos] = (high >> 8) & 0xFF; ++opos;
+	//obuf[opos] = high & 0xFF; ++opos;
+
+	obuf.push_back(high >> 24);
+	obuf.push_back((high >> 16) & 0xFF);
+	obuf.push_back((high >> 8) & 0xFF);
+	obuf.push_back(high & 0xFF);
+
 	/* Cleanup */
 	free(mdl);
-	*olen = opos;
+	*olen = obuf.size();
 	return 0;
 }
 int FastAri::fa_decompress_2013(const unsigned char* ibuf, unsigned char* obuf, size_t ilen, size_t olen)

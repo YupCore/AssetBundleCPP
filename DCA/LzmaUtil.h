@@ -21,7 +21,7 @@
 namespace pag {
 class LzmaUtil {
  public:
-  static uint8_t* Compress(uint8_t* inData, uint64_t inSize, uint64_t &outSize, int compressionLevel);
+  static uint8_t* Compress(uint8_t*& inData, uint64_t inSize, uint64_t &outSize, int compressionLevel);
 
   static uint8_t* Decompress(uint8_t* inputData, uint64_t inSize, uint64_t &outSize);
 };

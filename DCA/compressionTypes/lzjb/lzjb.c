@@ -57,13 +57,13 @@
 /* For memcmp */
 #include <string.h>
 
-#define	MATCH_BITS	6
-#define	MATCH_MIN	3
+#define	MATCH_BITS	8
+#define	MATCH_MIN	4
 #define	MATCH_MAX	((1 << MATCH_BITS) + (MATCH_MIN - 1))
 #define	OFFSET_MASK	((1 << (16 - MATCH_BITS)) - 1)
-#define	LEMPEL_SIZE	1024
+#define	LEMPEL_SIZE	0x2000
 #ifndef NBBY
-#define NBBY 8
+#define NBBY 12
 #endif
 
 #ifdef __GNUC__

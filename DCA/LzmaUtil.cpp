@@ -197,7 +197,7 @@ uint8_t* code(uint8_t* inputData, uint64_t inSize, uint64_t& outSize, int compre
   CLzma2EncHandle encoder = nullptr;
 };
 
-uint8_t* LzmaUtil::Compress(uint8_t* inData, uint64_t inSize, uint64_t& outSize, int compressionLevel) {
+uint8_t* LzmaUtil::Compress(uint8_t*& inData, uint64_t inSize, uint64_t& outSize, int compressionLevel) {
   Lzma2Encoder encoder;
   return encoder.code(inData,inSize,outSize,compressionLevel);
 }
