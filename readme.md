@@ -19,12 +19,24 @@ Has multiple compressions:
 Example:
 
 ```cpp
+#include <iostream>
 #include <AssetBundle.h>
 #include <filesystem>
-#include <iostream>
+#include <irrKlang.h>
+#include <windows.h>
+#include <thread>
+#include <atlstr.h>
+#include <locale> 
+#include <codecvt>
+#include <Windows.h>
+
+using namespace std;
+using namespace irrklang;
+
+
 int main(int argc, char* argv[])
 {
-	std::cout << "Welcome to asset bundle tool,\n";
+	std::cout << "Welcome to YupGames archive test app, playing music!\nEnter folder to pack or asset bundle:.\n";
 	AssetBundle* abs = nullptr;
 
 	std::cout << "Enter bundle path: \n";
@@ -61,49 +73,71 @@ int main(int argc, char* argv[])
 				args.push_back(entry.path().string());
 			}
 		}
-		CompressionType compType;
+		ArchiveCompressionType compType;
 		std::string compTypeStr = "";
-		std::cout << "Enter compression type: LZMA2, LZ77,FastAri,MTAri, or NO(no compression)\n";
+		std::cout << "Enter compression type: LZMA2, LZ77, FARI, LZJB, LZSSE, BSC, LZP, FPC, or NO(no compression)\n";
 		std::cin >> compTypeStr;
 		if (compTypeStr == "LZMA2")
 		{
-			compType = CompressionType::LZMA2;
+			compType = ArchiveCompressionType::LZMA2;
 		}
-		else if(compTypeStr == "LZ77")
+		else if (compTypeStr == "LZ77")
 		{
-			compType = CompressionType::LZ77;
+			compType = ArchiveCompressionType::LZ77;
 		}
-		else if (compTypeStr == "FastAri")
+		else if (compTypeStr == "FARI")
 		{
-			compType = CompressionType::FastAri;
+			compType = ArchiveCompressionType::FastAri;
 		}
-		else if (compTypeStr == "MTAri")
+		else if (compTypeStr == "LZJB")
 		{
-			compType = CompressionType::MTAri;
+			compType = ArchiveCompressionType::LZJB;
+		}
+		else if (compTypeStr == "LZSSE")
+		{
+			compType = ArchiveCompressionType::LZSSE;
+		}
+		else if (compTypeStr == "BSC")
+		{
+			compType = ArchiveCompressionType::BSC;
+		}
+		else if (compTypeStr == "LZP")
+		{
+			compType = ArchiveCompressionType::LZP;
 		}
 		else if (compTypeStr == "NO")
 		{
-			compType = CompressionType::NoCompression;
+			compType = ArchiveCompressionType::NoCompression;
 		}
 
 		else
 		{
 			std::cout << "No type specified, using LZMA2\n";
-			compType = CompressionType::LZMA2;
+			compType = ArchiveCompressionType::LZMA2;
 		}
 
-		if (compType == CompressionType::LZMA2)
+		std::string computeHash = "";
+		std::cout << "Compute hash(CRC32)?: y or n \n";
+		std::cin >> computeHash;
+
+		bool compHash = false;
+		if (computeHash == "y")
+		{
+			compHash = true;
+		}
+
+		if (compType == ArchiveCompressionType::LZMA2 || compType == ArchiveCompressionType::LZSSE || compType == ArchiveCompressionType::BSC)
 		{
 			std::string compression = "";
 			std::cout << "Enter compression level:\n";
 			std::cin >> compression;
 			std::string absPath = std::filesystem::absolute(std::filesystem::path("./")).generic_string();
-			abs = new AssetBundle(arPath, stoi(compression), compType, absPath, args.data(), args.size());
+			abs = new AssetBundle(arPath, stoi(compression), compType, compHash, absPath, args.data(), args.size());
 		}
 		else
 		{
 			std::string absPath = std::filesystem::absolute(std::filesystem::path("./")).generic_string();
-			abs = new AssetBundle(arPath, 0, compType, absPath, args.data(), args.size());
+			abs = new AssetBundle(arPath, 0, compType, compHash, absPath, args.data(), args.size());
 		}
 	}
 	else
@@ -112,21 +146,41 @@ int main(int argc, char* argv[])
 		abs = new AssetBundle(arPath);
 	}
 
-	std::cout << "Enter action: decompressall\n";
+	std::cout << "Enter action: extAll, listAll\n";
 	std::string act = "";
 	std::cin >> act;
 
-	if (act == "decompressall")
+	if (act == "listAll")
+	{
+		for (auto& f : abs->ListFiles())
+		{
+			std::cout << f + "\r\n";
+		}
+	}
+	else if (act == "extAll") // extract all files to a directory
 	{
 		std::cout << "Enter directory to decomress:\n";
 		std::string dir = "";
 		std::cin >> dir;
+		if (dir == ".")
+		{
+			dir = "";
+		}
+		else
+		{
+			if (!dir.ends_with("\\") || !dir.ends_with("/"))
+			{
+				dir += "\\";
+			}
+		}
 
-		abs->ExtractToDirectory(dir + "/");
+		abs->ExtractToDirectory("\\" + dir);
 		std::cout << "Done.\n";
 	}
+
 	abs->Close();
-	getchar();
+
+	std::system("pause");
 	return 0;
 }
 ```
